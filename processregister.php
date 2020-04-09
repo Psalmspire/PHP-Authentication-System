@@ -1,8 +1,46 @@
-<?php
+<?php session_start();
 
 //Collecting data from form
 
-$first_name = $_POST['first_name']
+//$errorArray =[];
+
+
+
+//verification/data validation
+$_SESSION['first_name']=$first_name;
+$_SESSION['last_name']=$last_name;
+$_SESSION['email']=$email;
+$_SESSION['gender']=$gender;
+$_SESSION['designation']=$designation;
+$_SESSION['department']=$department;
+
+$errorCount = 0;
+ 
+$first_name = $_POST['first_name'] != ""? $_POST['first_name'] : $errorCount++;
+$last_name = $_POST['last_name'] != ""? $_POST['last_name'] : $errorCount++;
+$email = $_POST['email'] != ""? $_POST['email'] : $errorCount++;
+$gender = $_POST['gender'] != ""? $_POST['gender'] : $errorCount++;
+$designation = $_POST['designation'] != ""? $_POST['designation'] : $errorCount++;
+$department = $_POST['department'] != ""? $_POST['department'] : $errorCount++;
+$password = $_POST['password'] != ""? $_POST['password'] : $errorCount++;
+
+
+
+if($errorCount > 0){
+    //redirect back and display error
+    $_SESSION['error'] = "You have ".$errorCount ." errors in your form submission";
+    header("Location: register.php");
+}
+else{
+
+//count all users
+$allUsers = scandir("db/users/");
+$countAllusers = count($allUsers);
+$newuserId = ($countAllusers-2) +1; 
+
+//saving data in db
+
+$first_name = $_POST['first_name'];
 $last_name = $_POST['last_name'];
 $email = $_POST['email'];
 $department= $_POST['department'];
@@ -10,22 +48,30 @@ $password = $_POST['password'];
 $gender = $_POST['gender'];
 $designation = $_POST['designation'];
 
-//verification/data validation
+$UserData =[
+    'ID' => $newuserId, 
+    'first_name'=> $first_name,
+    'last_name'=> $last_name,
+    'password'=> $password,
+    'email'=> $email,
+    'department'=> $department,
+    'designation'=> $designation,
+    'gender'=> $gender
+  ];
 
-$errorCount = 0;
-$first_name = $_POST['first_name'] != ""? $_POST['first_name'] : $errorCount++;
-$last_name = $_POST['last_name'] != ""? $_POST['last_name'] : $errorCount++;
-$email = $_POST['email'] != ""? $_POST['email'] : $errorCount++;
+echo file_put_contents("db/users/".$first_name.$last_name.".json", json_encode($UserData));
+//return to page with status message
+$_SESSION['message'] = "Registration successful! You can now login";
+header("Location: login.php");//redirect to login page
 
-if($errorCount > 0{
-    //redirect back and display error
-})
-else{
     //continue to database
+    echo "Successfully signed up";
 }
 
-/*
 
+
+
+/*
 $errorArray = [];
 if($first_name == ""){
     $errorArray = "First name cannot be blank"; //print the error in $errorArray if the data returns empty
@@ -57,8 +103,6 @@ if($designation == ""){
 
 */
 
-//saving data in db
-//return to page with status message
 
 
 
