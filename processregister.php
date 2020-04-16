@@ -7,12 +7,13 @@
 
 
 //verification/data validation
-$_SESSION['first_name']=$first_name;
+/*$_SESSION['first_name']=$first_name;
 $_SESSION['last_name']=$last_name;
 $_SESSION['email']=$email;
 $_SESSION['gender']=$gender;
 $_SESSION['designation']=$designation;
 $_SESSION['department']=$department;
+*/
 
 $errorCount = 0;
  
@@ -36,7 +37,7 @@ else{
 //count all users
 $allUsers = scandir("db/users/");
 $countAllusers = count($allUsers);
-$newuserId = ($countAllusers-2) +1; 
+$newuserId = ($countAllusers-2); 
 
 //saving data in db
 
@@ -47,6 +48,8 @@ $department= $_POST['department'];
 $password = $_POST['password'];
 $gender = $_POST['gender'];
 $designation = $_POST['designation'];
+
+
 
 $UserData =[
     'ID' => $newuserId, 
@@ -59,10 +62,15 @@ $UserData =[
     'gender'=> $gender
   ];
 
-echo file_put_contents("db/users/".$first_name.$last_name.".json", json_encode($UserData));
+echo file_put_contents("db/users/".$email.".json", json_encode($UserData));
 //return to page with status message
+print_r($allUsers);
+die();
+
 $_SESSION['message'] = "Registration successful! You can now login";
 header("Location: login.php");//redirect to login page
+
+
 
     //continue to database
     echo "Successfully signed up";
