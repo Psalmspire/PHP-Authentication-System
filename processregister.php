@@ -1,22 +1,16 @@
 <?php session_start();
 
-//Collecting data from form
-
-//$errorArray =[];
-
-
-
-//verification/data validation
-/*$_SESSION['first_name']=$first_name;
-$_SESSION['last_name']=$last_name;
-$_SESSION['email']=$email;
-$_SESSION['gender']=$gender;
-$_SESSION['designation']=$designation;
-$_SESSION['department']=$department;
-*/
-
 $errorCount = 0;
+
+$first_name = $_POST['first_name'];
+$last_name = $_POST['last_name'];
+$email = $_POST['email'];
+$department= $_POST['department'];
+$password = $_POST['password'];
+$gender = $_POST['gender'];
+$designation = $_POST['designation'];
  
+//To check if an input field is empty... if empty count error and return number of empty fields
 $first_name = $_POST['first_name'] != ""? $_POST['first_name'] : $errorCount++;
 $last_name = $_POST['last_name'] != ""? $_POST['last_name'] : $errorCount++;
 $email = $_POST['email'] != ""? $_POST['email'] : $errorCount++;
@@ -26,55 +20,75 @@ $department = $_POST['department'] != ""? $_POST['department'] : $errorCount++;
 $password = $_POST['password'] != ""? $_POST['password'] : $errorCount++;
 
 
+$_SESSION['first_name'] = $first_name;
+$_SESSION['last_name'] = $last_name;
+$_SESSION['email'] = $email;
+$_SESSION['gender'] = $gender;
+$_SESSION['designation'] = $designation;
+$_SESSION['department'] = $first_name;
+
 
 if($errorCount > 0){
     //redirect back and display error
-    $_SESSION['error'] = "You have ".$errorCount ." errors in your form submission";
+    $session_error = "You have " . $errorCount . " error";
+
+    if ($errorCount > 1){
+        $session_error .= "s";
+    }
+
+    $session_error .= " in your registration submission";
+
+    $_SESSION['error'] = $session_error;
     header("Location: register.php");
+    die();
 }
 else{
-
-//count all users
+//count all users and assign the next available number as ID
 $allUsers = scandir("db/users/");
-$countAllusers = count($allUsers);
-$newuserId = ($countAllusers-2); 
+$countallUsers = count($allUsers);
+$newuserId = ($countallUsers-1); 
 
-//saving data in db
-
-$first_name = $_POST['first_name'];
-$last_name = $_POST['last_name'];
-$email = $_POST['email'];
-$department= $_POST['department'];
-$password = $_POST['password'];
-$gender = $_POST['gender'];
-$designation = $_POST['designation'];
-
-
-
+//Creation of array Userdata to be stored in the database
 $UserData =[
     'ID' => $newuserId, 
     'first_name'=> $first_name,
     'last_name'=> $last_name,
-    'password'=> $password,
+    'password'=> password_hash($password, PASSWORD_DEFAULT),
     'email'=> $email,
     'department'=> $department,
     'designation'=> $designation,
     'gender'=> $gender
   ];
 
-echo file_put_contents("db/users/".$email.".json", json_encode($UserData));
-//return to page with status message
-print_r($allUsers);
-die();
+for ($counter = 0; $countallUsers <= 10; $counter++) {
 
-$_SESSION['message'] = "Registration successful! You can now login";
-header("Location: login.php");//redirect to login page
+    $CurrentUser = $allUsers[$counter];
 
+    if($CurrentUser == $email.".json"){
 
-
-    //continue to database
-    echo "Successfully signed up";
+        $_SESSION['error'] = "Registration failed! User already exist. Please login";
+        header("Location: register.php");   
+        die(); //Error redirects back to page if email address already exist.
+         
+    }
+    else{//Store in database using email as file name.
+file_put_contents("db/users/".$email.".json", json_encode($UserData));
+$_SESSION['message'] = "Registration successful! You can now login " . $first_name;
+header("Location: login.php");   //redirect to login page
+    }
 }
+}
+ 
+
+
+
+ 
+ 
+
+    
+
+
+
 
 
 

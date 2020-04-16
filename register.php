@@ -8,7 +8,7 @@ include_once('lib/header.php');
 <p><strong> Welcome! please register below </strong></p>
 <p>All fields are required</p>
 
-
+<h2>REGISTER HERE!</h2> 
 <form method="POST" action="processregister.php">
     <p>
         <?php
